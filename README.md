@@ -2,9 +2,9 @@
 
 [![Playwright Tests](https://github.com/WesleyCouti/qa-playwright-framework/actions/workflows/playwright.yml/badge.svg)](https://github.com/WesleyCouti/qa-playwright-framework/actions/workflows/playwright.yml)
 
-End-to-end and API test automation framework built with **Playwright and TypeScript**, focused on maintainability, test organization, reusable components and continuous integration.
+End-to-end and API test automation framework built with **Playwright and TypeScript**, focused on maintainability, reusable components, cross-browser testing and continuous integration.
 
-This project is part of my QA Automation portfolio and demonstrates practical approaches I use when structuring automated tests for web applications and APIs.
+This project is part of my QA Automation portfolio and demonstrates practical approaches to structuring automated tests for web applications and APIs.
 
 ---
 
@@ -17,6 +17,7 @@ This project is part of my QA Automation portfolio and demonstrates practical ap
 - Playwright Fixtures
 - API Testing
 - GitHub Actions
+- Cross-browser Testing
 - HTML Report
 - Trace, screenshots and videos on failure
 
@@ -39,10 +40,10 @@ Automated against SauceDemo:
 
 Automated against JSONPlaceholder:
 
-- Retrieve resource
-- Create resource
-- Basic response contract validation
-- Non-existent resource validation
+- Retrieve post by ID
+- Create post
+- Validate user response contract
+- Validate unknown resource response
 
 ---
 
@@ -70,13 +71,16 @@ The framework separates test logic, page interactions, reusable fixtures and tes
            Playwright
               │
               ▼
+        Chromium / Firefox
+              │
+              ▼
         GitHub Actions
               │
               ▼
       HTML Report / Artifacts
 ```
 
-This separation helps reduce duplicated code and keeps test scenarios focused on business behavior rather than implementation details.
+This separation helps reduce duplicated code and keeps test scenarios focused on expected behavior rather than implementation details.
 
 ---
 
@@ -114,7 +118,7 @@ qa-playwright-framework/
 
 ## Test Strategy
 
-The framework was structured around a few principles that I consider important when working with test automation:
+The framework was structured around principles commonly applied to maintainable test automation.
 
 ### Maintainability
 
@@ -132,9 +136,88 @@ Tests avoid fixed waits whenever possible and rely on Playwright's auto-waiting 
 
 UI and API tests are kept in separate suites, allowing each layer to be executed independently.
 
+### Cross-Browser Validation
+
+The automated suite is currently executed against:
+
+- Chromium
+- Firefox
+
+Running the same scenarios across different browser engines helps identify browser-specific behavior and increases confidence in application compatibility.
+
 ### Continuous Integration
 
-Automated tests run through GitHub Actions so the project can be validated without depending on a local development environment.
+Automated tests run through GitHub Actions so the project can be validated in a clean CI environment without depending only on a local development machine.
+
+---
+
+## CI Execution
+
+The complete automation suite is continuously validated through **GitHub Actions**.
+
+### Current Test Execution
+
+| Metric | Result |
+|---|---|
+| Functional scenarios | 8 |
+| Total test executions | 16 |
+| Passed | 16 ✅ |
+| Failed | 0 |
+| Browsers | Chromium + Firefox |
+| TypeScript validation | ✅ Passing |
+| HTML report | ✅ Generated |
+| CI pipeline | ✅ Passing |
+
+The current suite contains **8 automated scenarios executed across Chromium and Firefox**, resulting in **16 successful test executions**.
+
+The latest validated execution completed the test suite in approximately **12 seconds**.
+
+### Execution Matrix
+
+| Layer | Scenario | Chromium | Firefox |
+|---|---|:---:|:---:|
+| API | Retrieve post by ID | ✅ | ✅ |
+| API | Create post | ✅ | ✅ |
+| API | Validate user contract fields | ✅ | ✅ |
+| API | Unknown resource validation | ✅ | ✅ |
+| E2E | Add product to cart | ✅ | ✅ |
+| E2E | Complete checkout | ✅ | ✅ |
+| E2E | Successful login | ✅ | ✅ |
+| E2E | Locked user validation | ✅ | ✅ |
+
+---
+
+## CI/CD Pipeline
+
+The project uses **GitHub Actions** to automatically validate the framework.
+
+```text
+Checkout repository
+        ↓
+Setup Node.js
+        ↓
+Install dependencies
+        ↓
+Install Playwright browsers
+        ↓
+TypeScript validation
+        ↓
+Run automated tests
+        ↓
+Chromium + Firefox
+        ↓
+Generate Playwright HTML report
+        ↓
+Upload report as CI artifact
+```
+
+The pipeline validates the TypeScript project before executing the automated suite.
+
+After execution, the Playwright HTML report is uploaded as a GitHub Actions artifact for analysis.
+
+The workflow can also be manually triggered through the **Actions** tab.
+
+The current pipeline status is displayed by the badge at the top of this README.
 
 ---
 
@@ -215,43 +298,15 @@ Open the report locally with:
 npm run report
 ```
 
-When tests fail, the framework can also retain debugging evidence such as:
+When tests fail, the framework can retain debugging evidence such as:
 
-- Screenshot
-- Video
+- Screenshots
+- Videos
 - Playwright Trace
 
-These artifacts help investigate failures without immediately reproducing the scenario locally.
+These artifacts help investigate failures without requiring the scenario to be immediately reproduced locally.
 
----
-
-## CI/CD
-
-The project uses **GitHub Actions** to automatically validate the automation framework.
-
-The pipeline performs:
-
-```text
-Checkout repository
-        ↓
-Setup Node.js
-        ↓
-Install dependencies
-        ↓
-Install Playwright browsers
-        ↓
-Type check
-        ↓
-Run automated tests
-        ↓
-Generate HTML report
-        ↓
-Upload test artifacts
-```
-
-The workflow can also be executed manually through the **Actions** tab.
-
-Current pipeline status is displayed by the badge at the top of this README.
+In CI, the HTML report is automatically uploaded as an artifact after the test execution.
 
 ---
 
@@ -259,13 +314,13 @@ Current pipeline status is displayed by the badge at the top of this README.
 
 ### SauceDemo
 
-Used for browser-based E2E scenarios such as authentication, cart operations and checkout.
+Used for browser-based E2E scenarios covering authentication, shopping cart operations and checkout.
 
 ### JSONPlaceholder
 
-Used for API automation scenarios and HTTP response validations.
+Used for API automation scenarios covering HTTP requests, resource creation and response validation.
 
-The applications are public testing environments and are not affiliated with this project.
+Both applications are public testing environments and are not affiliated with this project.
 
 ---
 
@@ -275,21 +330,31 @@ The applications are public testing environments and are not affiliated with thi
 
 Playwright provides browser automation, API testing, auto-waiting, tracing and multi-browser capabilities within the same framework.
 
-This makes it possible to keep different test layers under a consistent automation stack.
+This allows different test layers to remain under a consistent automation stack.
 
 ### Why Page Object Model?
 
 Page Objects keep selectors and page interactions outside the test scenarios.
 
-Instead of coupling tests directly to UI implementation details, scenarios can remain focused on expected behavior.
+Instead of coupling tests directly to UI implementation details, scenarios remain focused on expected application behavior.
 
 ### Why Fixtures?
 
 Fixtures provide a structured way to share reusable dependencies and setup between tests without duplicating initialization logic.
 
+### Why Cross-Browser Testing?
+
+Executing the same scenarios against multiple browser engines helps identify compatibility issues without maintaining separate test implementations.
+
+The current CI strategy validates the suite against Chromium and Firefox.
+
 ### Why GitHub Actions?
 
-Continuous integration ensures the framework can be installed and executed in a clean environment, providing additional confidence that the project does not depend only on a developer's local machine.
+Continuous integration ensures the framework can be installed and executed in a clean environment.
+
+This provides additional confidence that successful execution does not depend only on local machine configuration.
+
+It also creates a repeatable validation process for every relevant repository change.
 
 ---
 
@@ -304,7 +369,7 @@ Possible next improvements:
 - [ ] Smoke and regression tags
 - [ ] Additional reporting
 - [ ] Parallel execution strategy
-- [ ] Cross-browser execution
+- [ ] WebKit execution
 
 ---
 
